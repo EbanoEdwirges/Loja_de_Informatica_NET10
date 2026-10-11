@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;//Adicionar Classes CultureInfo e ComprareInfo
 
 namespace Loja_de_Informatica_NET10
 {
@@ -36,27 +37,88 @@ namespace Loja_de_Informatica_NET10
         //MÉTODO CADASTRAR FUNCIONÁRIOO
         internal void CadastrarFuncionario()
         {
+            CompareInfo comparador = new CultureInfo("pt-BR").CompareInfo;
+
             Funcionario funcionario = new Funcionario();
 
-            ListarFuncionarios();
-
-            Console.WriteLine(Menu.nomeLoja);
-
-            Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
-            Console.WriteLine("INFORME 'NOME' DO FUNCIONÁRIO OU '0' PARA RETORNAR!\n");
-
-            Console.Write("Nome: ");
-            funcionario.Nome = Console.ReadLine() ?? "";
-            if (funcionario.Nome == "0")
+            while (true)
             {
+                ListarFuncionarios();
+
+                Console.WriteLine(Menu.nomeLoja);
+
+                Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
+                Console.WriteLine("INFORME 'NOME' DO FUNCIONÁRIO OU '0' PARA RETORNAR!\n");
+
+                Console.Write("Nome: ");
+                funcionario.Nome = (Console.ReadLine() ?? "").Trim();
                 Console.Clear();
-                return;
+                if (funcionario.Nome == "0")
+                {
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(funcionario.Nome))
+                {
+                    Console.WriteLine("Nome inválido!\n");
+                    Console.WriteLine("Digite qualquer tecla para continuar!");
+                    Console.ReadKey();
+                    Console.Clear();
+                    continue;
+                }
+
+                bool nomeDuplicado = false;
+
+                foreach (Funcionario funcionarioExistente in _funcionarios)
+                {
+                    if (comparador.Compare(funcionarioExistente.Nome, funcionario.Nome, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0)
+                    {
+                        nomeDuplicado = true;
+                        break;
+                    }
+                }
+
+                if (!nomeDuplicado)
+                {
+                    break;
+                }
+
+                Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
+                Console.WriteLine("Já existe Funcionário cadastrado com este nome!\n");
+                Console.WriteLine("1-Manter Nome informado;");
+                Console.WriteLine("2-Tentar novo Nome;");
+                Console.WriteLine("0-Retornar.");
+                string opcao = Console.ReadLine() ?? "";
+                Console.Clear();
+
+                while (opcao != "1" && opcao != "2" && opcao != "0")
+                {
+                    Console.WriteLine("Já existe Funcionário cadastrado com este nome!\n");
+                    Console.WriteLine("1-Manter Nome informado;");
+                    Console.WriteLine("2-Informar novo nome;");
+                    Console.WriteLine("0-Retornar.");
+                    opcao = Console.ReadLine() ?? "";
+                    Console.Clear();
+                }
+
+                if (opcao == "0")
+                {
+                    return;
+                }
+
+                if (opcao == "2")
+                {
+                    continue;
+                }
+
+                break;
             }
+
             Console.Write("Telefone: ");
-            funcionario.Telefone = Console.ReadLine() ?? "";
+            funcionario.Telefone = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
 
             Console.Write("CPF: ");
-            funcionario.CPF = Console.ReadLine() ?? "";
+            funcionario.CPF = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
             Console.Write("Função: ");
             funcionario.Funcao = Console.ReadLine() ?? "";
 
@@ -125,9 +187,17 @@ namespace Loja_de_Informatica_NET10
                 return _funcionariosEncontrados;
             }
 
+            //Cria objeto com as funções da Classe CultureInfo na linguagem pt-BR
+            CultureInfo cultura = new CultureInfo("pt-BR");
+
+            //Passa configurações do método CompareInfo do novo objeto da Classe CultureInfo para novo objeto criado do tipo CompareInfo
+            CompareInfo comparador = cultura.CompareInfo;
+
             foreach (Funcionario funcionario in _funcionarios)
             {
-                if (funcionario.Nome != null && funcionario.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase))
+                //Utiliza as configurações do novo objeto "comparador" para comparar e ignorar maiúsculo e minúsculo, também com ou sem acentuação
+                //IndexOf retorna posição do início da string buscada e caso não encontre, retorna "0", portanto ">= 0" se encontrar irá retornar valor igual ou maior que "0", caso não, retorna "-1", então condição será "true" quando encontrar ou "false" quando não encontrar, devido a verificação ">= 0"
+                if (funcionario.Nome != null && comparador.IndexOf(funcionario.Nome, nome, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0)
                 {
                     _funcionariosEncontrados.Add(funcionario);
                 }
@@ -171,52 +241,49 @@ namespace Loja_de_Informatica_NET10
             List<Funcionario> _funcionariosEncontrados = BuscarFuncionarioPorNome(Console.ReadLine() ?? "");
             Console.Clear();
 
-            foreach (Funcionario funcionario in _funcionariosEncontrados)
+            while (_funcionariosEncontrados.Count == 0)
             {
-                while (funcionario == null)
+                Console.WriteLine(Menu.nomeLoja);
+                Console.WriteLine("CONSULTAR FUNCIONÁRIO\n");
+
+                Console.WriteLine(">>> Não foi encontrado Funcionário!! <<<\n");
+                Console.WriteLine("1-Tentar novamente;");
+                Console.WriteLine("0-Retornar.");
+
+                string opcao = Console.ReadLine() ?? "";
+                Console.Clear();
+
+                while (opcao != "1" && opcao != "0")
                 {
                     Console.WriteLine(Menu.nomeLoja);
                     Console.WriteLine("CONSULTAR FUNCIONÁRIO\n");
 
-                    Console.WriteLine(">>> Funcionário não encontrado!!\n");
                     Console.WriteLine("1-Tentar novamente;");
                     Console.WriteLine("0-Retornar.");
-
-                    string opcao = Console.ReadLine() ?? "";
-                    Console.Clear();
-
-                    while (opcao != "1" && opcao != "0")
-                    {
-                        Console.WriteLine(Menu.nomeLoja);
-                        Console.WriteLine("CONSULTAR FUNCIONÁRIO\n");
-
-                        Console.WriteLine("1-Tentar novamente;");
-                        Console.WriteLine("0-Retornar.");
-                        opcao = Console.ReadLine() ?? "";
-                        Console.Clear();
-                    }
-
-                    if (opcao == "0")
-                    {
-                        return;
-                    }
-
-                    ListarFuncionarios();
-
-                    Console.WriteLine(Menu.nomeLoja);
-                    Console.WriteLine("CONSULTAR FUNCIONÁRIO\n");
-
-                    Console.Write("Informe Nome: ");
-                    _funcionariosEncontrados = BuscarFuncionarioPorNome(Console.ReadLine() ?? "");
+                    opcao = Console.ReadLine() ?? "";
                     Console.Clear();
                 }
+
+                if (opcao == "0")
+                {
+                    return;
+                }
+
+                ListarFuncionarios();
+
+                Console.WriteLine(Menu.nomeLoja);
+                Console.WriteLine("CONSULTAR FUNCIONÁRIO\n");
+
+                Console.Write("Informe Nome: ");
+                _funcionariosEncontrados = BuscarFuncionarioPorNome(Console.ReadLine() ?? "");
+                Console.Clear();
             }
 
             foreach (Funcionario funcionario in _funcionariosEncontrados)
             {
                 Console.Write($"Nome: {funcionario.Nome}");
                 Console.WriteLine($" - Telefone: {funcionario.Telefone}");
-                Console.WriteLine($"CPF: {funcionario.CPF}");
+                Console.WriteLine($"CPF: {funcionario.CPF}\n");
             }
 
             Console.WriteLine("\nPrecione qualquer tecla para retornar!");

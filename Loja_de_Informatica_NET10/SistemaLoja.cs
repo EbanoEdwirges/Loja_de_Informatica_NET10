@@ -31,8 +31,6 @@ namespace Loja_de_Informatica_NET10
         //MÉTODOS SISTEMA LOJA PARA MENU
         //MÉTODO EBIBIR MENU PRINCIPAL
 
-
-
         //MÉTODOS SISTEMA LOJA PARA FUNCIONÁRIO
         //MÉTODO CADASTRAR FUNCIONÁRIOO
         internal void CadastrarFuncionario()
@@ -48,7 +46,8 @@ namespace Loja_de_Informatica_NET10
                 Console.WriteLine(Menu.nomeLoja);
 
                 Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
-                Console.WriteLine("INFORME 'NOME' DO FUNCIONÁRIO OU '0' PARA RETORNAR!\n");
+                Console.WriteLine("INFORME 'NOME' DO FUNCIONÁRIO");
+                Console.WriteLine("OU '0' PARA RETORNAR!\n");
 
                 Console.Write("Nome: ");
                 funcionario.Nome = (Console.ReadLine() ?? "").Trim();
@@ -78,47 +77,113 @@ namespace Loja_de_Informatica_NET10
                     }
                 }
 
-                if (!nomeDuplicado)
+                if (nomeDuplicado)
                 {
+                    Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
+                    Console.WriteLine("Já existe Funcionário cadastrado com este nome!\n");
+                    Console.WriteLine("1-Tentar outro Nome;");
+                    Console.WriteLine("2-Manter Nome informado;");
+                    Console.WriteLine("0-Retornar.");
+                    string opcao = Console.ReadLine() ?? "";
+                    Console.Clear();
+
+                    while (opcao != "1" && opcao != "2" && opcao != "0")
+                    {
+                        Console.WriteLine("Valor inválido!\n");
+                        Console.WriteLine("1-Tentar outro Nome;");
+                        Console.WriteLine("2-Manter Nome informado;");
+                        Console.WriteLine("0-Retornar.");
+                        opcao = Console.ReadLine() ?? "";
+                        Console.Clear();
+                    }
+
+                    if (opcao == "0")
+                    {
+                        return;
+                    }
+
+                    if (opcao == "1")
+                    {
+                        continue;
+                    }
+
                     break;
                 }
 
-                Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
-                Console.WriteLine("Já existe Funcionário cadastrado com este nome!\n");
-                Console.WriteLine("1-Manter Nome informado;");
-                Console.WriteLine("2-Tentar novo Nome;");
-                Console.WriteLine("0-Retornar.");
-                string opcao = Console.ReadLine() ?? "";
-                Console.Clear();
+                break;
+            }
+            Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
+            Console.WriteLine($"Nome: {funcionario.Nome}");
 
-                while (opcao != "1" && opcao != "2" && opcao != "0")
+            Console.Write("Telefone: ");
+            funcionario.Telefone = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
+            Console.Clear();
+            while (funcionario.Telefone.Length != 11)
+            {
+                Console.WriteLine("Formato Telefone 'DDD + 9 números'!\n");
+                Console.Write("Telefone: ");
+                funcionario.Telefone = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
+                Console.Clear();
+            }
+
+            while (true)
+            {
+                Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
+                Console.WriteLine($"Nome: {funcionario.Nome}");
+                Console.WriteLine($"Telefone: {funcionario.Telefone}");
+
+                Console.Write("CPF: ");
+                funcionario.CPF = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
+                Console.Clear();
+                while (funcionario.CPF.Length != 11)
                 {
-                    Console.WriteLine("Já existe Funcionário cadastrado com este nome!\n");
-                    Console.WriteLine("1-Manter Nome informado;");
-                    Console.WriteLine("2-Informar novo nome;");
-                    Console.WriteLine("0-Retornar.");
-                    opcao = Console.ReadLine() ?? "";
+                    Console.WriteLine("CPF deve conter 11 números!\n");
+                    Console.Write("CPF: ");
+                    funcionario.CPF = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
                     Console.Clear();
                 }
-
-                if (opcao == "0")
+                bool cpfDuplicado = false;
+                foreach (Funcionario funcionarioExistente in _funcionarios)
                 {
-                    return;
+                    if (comparador.Compare(funcionarioExistente.CPF, funcionario.CPF, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0)
+                    {
+                        cpfDuplicado = true;
+                        break;
+                    }
                 }
 
-                if (opcao == "2")
+                if (cpfDuplicado)
                 {
+                    Console.WriteLine("Já existe este CPF cadastrado!\n");
+                    Console.WriteLine("1-Tentar outro CPF;");
+                    Console.WriteLine("0-Retornar.");
+                    string opcao = Console.ReadLine() ?? "";
+                    Console.Clear();
+
+                    while (opcao != "1" && opcao != "0")
+                    {
+                        Console.WriteLine("1-Tentar outro CPF;");
+                        Console.WriteLine("0-Retornar.");
+                        opcao = Console.ReadLine() ?? "";
+                        Console.Clear();
+                    }
+
+                    if (opcao == "0")
+                    {
+                        return;
+                    }
+
                     continue;
                 }
 
                 break;
             }
 
-            Console.Write("Telefone: ");
-            funcionario.Telefone = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
+            Console.WriteLine("CADASTRAR FUNCIONÁRIO\n");
+            Console.WriteLine($"Nome: {funcionario.Nome}");
+            Console.WriteLine($"Telefone: {funcionario.Telefone}");
+            Console.WriteLine($"CPF: {funcionario.CPF}");
 
-            Console.Write("CPF: ");
-            funcionario.CPF = Utilitarios.somenteNumeros(Console.ReadLine() ?? "");
             Console.Write("Função: ");
             funcionario.Funcao = Console.ReadLine() ?? "";
 
@@ -237,9 +302,17 @@ namespace Loja_de_Informatica_NET10
             Console.WriteLine(Menu.nomeLoja);
             Console.WriteLine("CONSULTAR FUNCIONÁRIO\n");
 
+            Console.WriteLine("INFORME '0' PARA RETORNAR ou!\n");
             Console.Write("Informe Nome: ");
-            List<Funcionario> _funcionariosEncontrados = BuscarFuncionarioPorNome(Console.ReadLine() ?? "");
+            string nomeFuncionario = Console.ReadLine() ?? "";
             Console.Clear();
+
+            if (nomeFuncionario == "0")
+            {
+                return;
+            }
+
+            List<Funcionario> _funcionariosEncontrados = BuscarFuncionarioPorNome(nomeFuncionario);
 
             while (_funcionariosEncontrados.Count == 0)
             {
@@ -297,11 +370,24 @@ namespace Loja_de_Informatica_NET10
         {
             ListarFuncionarios();
 
+            if (_funcionarios.Count == 0)
+            {
+                return;
+            }
+
+            Console.WriteLine("INFORME '0' PARA RETORNAR ou!\n");
             Console.Write("Informe CPF: ");
             string cpf = Console.ReadLine() ?? "";
             Console.Clear();
 
+            if (cpf == "0")
+            {
+                return;
+            }
+
             Funcionario? funcionario = BuscarFuncionarioPorCPF(cpf);
+
+            string opcao;
 
             while (funcionario == null)
             {
@@ -310,7 +396,7 @@ namespace Loja_de_Informatica_NET10
                 Console.WriteLine("1-Tentar novamente;");
                 Console.WriteLine("0-Retornar.");
 
-                string opcao = Console.ReadLine() ?? "";
+                opcao = Console.ReadLine() ?? "";
                 Console.Clear();
 
                 while (opcao != "1" && opcao != "0")
@@ -336,6 +422,33 @@ namespace Loja_de_Informatica_NET10
                 Console.Clear();
             }
 
+            Console.Write($"Nome: {funcionario.Nome} - ");
+            Console.Write($"CPF: {funcionario.CPF} - ");
+            Console.WriteLine($"Função: {funcionario.Funcao}\n");
+            Console.WriteLine("Deseja confirmar remoção do Funcionário?\n");
+            Console.WriteLine("1-Confirmar e Remover;");
+            Console.WriteLine("0-Retornar.");
+            opcao = Console.ReadLine() ?? "";
+            Console.Clear();
+
+            while(opcao != "1" && opcao != "0")
+            {
+                Console.WriteLine("VALOR INVÁLIDO!\n");
+                Console.Write($"Nome: {funcionario.Nome} - ");
+                Console.Write($"CPF: {funcionario.CPF} - ");
+                Console.WriteLine($"Função: {funcionario.Funcao}\n");
+                Console.WriteLine("Deseja confirmar remoção do Funcionário?\n");
+                Console.WriteLine("1-Confirmar e Remover;");
+                Console.WriteLine("0-Retornar.");
+                opcao = Console.ReadLine() ?? "";
+                Console.Clear();
+            }
+
+            if(opcao == "0")
+            {
+                return;
+            }
+
             _funcionarios.Remove(funcionario);
             Console.WriteLine("Funcionário removido com sucesso!");
             Console.Write("\nPrecione qualquer tecla para retornar.");
@@ -350,14 +463,25 @@ namespace Loja_de_Informatica_NET10
         {
             ListarFuncionarios();
 
+            if (_funcionarios.Count == 0)
+            {
+                return;
+            }
+
             Console.WriteLine(Menu.nomeLoja);
             Console.WriteLine("EDITAR FUNCIONÁRIO\n");
 
+            Console.WriteLine("INFORME '0' PARA RETORNAR!\n");
             Console.WriteLine("Informe CPF: ");
             string cpf = Console.ReadLine() ?? "";
+            Console.Clear();
+
+            if (cpf == "0")
+            {
+                return;
+            }
 
             Funcionario? funcionario = BuscarFuncionarioPorCPF(cpf);
-            Console.Clear();
 
             while (funcionario == null)
             {

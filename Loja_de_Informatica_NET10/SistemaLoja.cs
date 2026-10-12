@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Globalization;//Adicionar Classes CultureInfo e ComprareInfo
+using System.Globalization;//Adicionar Classes CultureInfo(IgnoreNonSpace-Ignorar acentuação em textos) e ComprareInfo(IgnoreCase-Ignorar Maiúsculo e Minúsculo)
 
 namespace Loja_de_Informatica_NET10
 {
@@ -35,8 +35,10 @@ namespace Loja_de_Informatica_NET10
         //MÉTODO CADASTRAR FUNCIONÁRIOO
         internal void CadastrarFuncionario()
         {
+            //Também foram implementados no método "BuscarFuncionarioPorNome"
             CompareInfo comparador = new CultureInfo("pt-BR").CompareInfo;
 
+            //Também foram implementados no método "BuscarFuncionarioPorNome"
             Funcionario funcionario = new Funcionario();
 
             while (true)
